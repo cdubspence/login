@@ -1,19 +1,56 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
+const { MongoClient, ServerApiVersion } = require('mongodb');
+const express = require('express');
+const app = express();
+
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const cors = require('cors');
+require('dotenv').config();
 
 //Set up mongoose connection
-var mongoDB = 'mongodb+srv://casey:1111@cluster0.s8ihz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
-mongoose.connect(mongoDB);
+const client = new MongoClient(process.env.DATABASE, 
+    { useNewUrlParser: true, 
+      useUnifiedTopology: true,
+      serverApi: ServerApiVersion.v1});
+      client.connect().then(() => {
+          console.log('DB Connected')
+      }).catch(() => {
+          console.log('Unable to connect')
+      });
 
-mongoose.Promise = global.Promise;
 
-//Get default connection
-var db = mongoose.connection;
+// Use parsing middleware
+app.use(bodyParser.json());
+app.use(cookieParser());
+app.use(cors);
 
-//Check DB connection status
-db.on('connected', function() {
-    console.log('Connection Established...');
-});
+//Import Routes
+const userRoutes = require('./routes/user');
 
-db.on('error', function(err) {
-    console.log('Connection error:' + err);
+//Using routes
+app.use('/api', userRoutes)
+
+const port = process.env.PORT || 8000
+
+//starting server
+
+app.listen(port, () => {
+    console.log(`App is running at ${port}`)
 })
+
+
+
+
+
+//old connection
+//var mongoDB = 'mongodb+srv://casey:1111@cluster0.s8ihz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
+// mongoose.connect(process.env.DATABASE, {
+//     useNewUrlParser: true,
+//     useCreateIndex: true,
+//     useUnifiedTopology: true
+// }).then(() => {
+//     console.log('DB Connected')
+// }).catch(() => {
+//     console.log('Unable to Connect')
+// });

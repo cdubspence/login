@@ -28,10 +28,23 @@
         form.addEventListener('submit', registerUser);
 
         function registerUser(event) {
+            event.preventDefault()
             const username = document.getElementById('registerName').value;
             const password = document.getElementById('registerPass').value;
             const email = document.getElementById('registerEmail').value;
 
+            const result = await fetch('/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username,
+                    email,
+                    password
+                })
+            }).then((res) => res.json())
+            console.log(result)
         }
     </script>
     
